@@ -121,3 +121,21 @@
 - [ ] نشر التطبيق على Google Play Store
 - [ ] تفعيل التحديثات التلقائية
 - [ ] مراقبة التقييمات والملاحظات
+
+
+## ملاحظات مهمة
+
+### حل مشكلة Gradle Build
+- تم إزالة مكتبة react-native-pdf-lib (كانت تحتاج pdfbox-android غير المتوفر)
+- تم تثبيت jsPDF و canvas كبدائل موثوقة
+- تم إنشاء PDFServiceV2 مع دعم كامل لإنشاء ملفات PDF
+
+### الملفات الجديدة
+- `lib/pdf-service-v2.ts`: خدمة PDF محسّنة باستخدام jsPDF
+- `BUILD_APK_GUIDE.md`: دليل شامل لبناء APK
+- `android/gradle.properties`: إعدادات التوقيع
+
+### الخطوات التالية
+1. بناء APK باستخدام EAS CLI أو Expo
+2. اختبار على جهاز حقيقي
+3. نشر على Google Play Store
