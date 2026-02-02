@@ -65,8 +65,8 @@ export default function HomeScreen() {
 
           <View className="gap-3">
             <Pressable
-              onPress={() => console.log("Create project")}
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              onPress={() => router.push("/image-picker-screen")}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
               className="bg-primary py-4 px-6 rounded-xl flex-row items-center justify-between"
             >
               <Text className="text-background font-semibold text-lg">إضافة صور جديدة</Text>
@@ -74,8 +74,8 @@ export default function HomeScreen() {
             </Pressable>
 
             <Pressable
-              onPress={() => console.log("Capture photo")}
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              onPress={() => router.push("/image-picker-screen?mode=camera")}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
               className="bg-surface py-4 px-6 rounded-xl flex-row items-center justify-between border border-border"
             >
               <Text className="text-foreground font-semibold text-lg">التقاط صورة</Text>

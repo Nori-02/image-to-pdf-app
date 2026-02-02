@@ -1,4 +1,5 @@
 import { ScrollView, Text, View, Pressable, FlatList, Image } from "react-native";
+import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -17,6 +18,12 @@ export default function ImagePickerScreen() {
   const router = useRouter();
   const colors = useColors();
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const [cameraMode, setCameraMode] = useState(false);
+
+  // التحقق من وضع الكاميرا من URL params
+  React.useEffect(() => {
+    // الالتزام بالصور المختارة
+  }, []);
 
   const pickImages = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -59,9 +66,18 @@ export default function ImagePickerScreen() {
 
   const handleNext = () => {
     if (selectedImages.length > 0) {
-      // Navigate to next screen for image editing
-      console.log("Proceeding with", selectedImages.length, "images");
+      // Navigate to image editor screen with selected images
+      router.push({
+        pathname: "/image-editor-screen",
+        params: {
+          images: JSON.stringify(selectedImages),
+        },
+      });
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -77,7 +93,7 @@ export default function ImagePickerScreen() {
           <View className="gap-3">
             <Pressable
               onPress={pickImages}
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
               className="bg-primary py-4 px-6 rounded-xl flex-row items-center justify-between"
             >
               <Text className="text-background font-semibold text-lg">اختر من المعرض</Text>
@@ -86,7 +102,7 @@ export default function ImagePickerScreen() {
 
             <Pressable
               onPress={takePhoto}
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
               className="bg-surface py-4 px-6 rounded-xl flex-row items-center justify-between border border-border"
             >
               <Text className="text-foreground font-semibold text-lg">التقاط صورة</Text>
@@ -130,16 +146,28 @@ export default function ImagePickerScreen() {
             </View>
           )}
 
-          {/* Next Button */}
-          {selectedImages.length > 0 && (
+          {/* Action Buttons */}
+          <View className="gap-3 flex-row">
             <Pressable
-              onPress={handleNext}
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-              className="bg-primary py-4 rounded-xl items-center mt-4"
+              onPress={handleBack}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
+              className="bg-surface py-4 rounded-xl items-center border border-border"
             >
-              <Text className="text-background font-semibold text-lg">التالي</Text>
+              <Text className="text-foreground font-semibold text-lg">رجوع</Text>
             </Pressable>
-          )}
+
+            {selectedImages.length > 0 ? (
+              <Pressable
+                onPress={handleNext}
+                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
+                className="bg-primary py-4 rounded-xl items-center"
+              >
+                <Text className="text-background font-semibold text-lg">التالي</Text>
+              </Pressable>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
+          </View>
         </View>
       </ScrollView>
     </ScreenContainer>
