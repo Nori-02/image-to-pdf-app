@@ -1,5 +1,6 @@
 import { ScrollView, Text, View, Pressable, Image } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
@@ -12,16 +13,38 @@ interface EditableImage {
 }
 
 export default function ImageEditorScreen() {
+  const router = useRouter();
   const colors = useColors();
+  const params = useLocalSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [editableImages, setEditableImages] = useState<EditableImage[]>([
-    {
-      uri: "https://via.placeholder.com/300",
-      rotation: 0,
-      brightness: 100,
-      contrast: 100,
-    },
-  ]);
+  const [editableImages, setEditableImages] = useState<EditableImage[]>([]);
+
+  // تحميل الصور من المعاملات
+  useEffect(() => {
+    if (params.images) {
+      try {
+        const images = JSON.parse(params.images as string);
+        const editableImgs = images.map((img: any) => ({
+          uri: img.uri,
+          rotation: 0,
+          brightness: 100,
+          contrast: 100,
+        }));
+        setEditableImages(editableImgs);
+      } catch (error) {
+        console.error("خطأ في تحميل الصور:", error);
+      }
+    }
+  }, [params.images]);
+
+  // إذا لم تكن هناك صور، عرض صورة افتراضية
+  if (editableImages.length === 0) {
+    return (
+      <ScreenContainer className="p-6 items-center justify-center">
+        <Text className="text-foreground text-lg">جاري تحميل الصور...</Text>
+      </ScreenContainer>
+    );
+  }
 
   const currentImage = editableImages[currentImageIndex];
 
@@ -124,16 +147,17 @@ export default function ImageEditorScreen() {
                 <Text className="text-muted">{currentImage.brightness}%</Text>
               </View>
               <View className="flex-row gap-2 items-center">
-                <Pressable
-                  onPress={() =>
-                    updateImage({
-                      brightness: Math.max(0, currentImage.brightness - 10),
-                    })
-                  }
-                  className="bg-surface border border-border p-2 rounded-lg"
-                >
-                  <Text className="text-foreground">−</Text>
-                </Pressable>
+              <Pressable
+                onPress={() =>
+                  updateImage({
+                    brightness: Math.max(0, currentImage.brightness - 10),
+                  })
+                }
+                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+                className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
+              >
+                <Text className="text-foreground font-bold text-lg">−</Text>
+              </Pressable>
                 <View className="flex-1 h-1 bg-border rounded-full" />
                 <Pressable
                   onPress={() =>
@@ -141,9 +165,10 @@ export default function ImageEditorScreen() {
                       brightness: Math.min(200, currentImage.brightness + 10),
                     })
                   }
-                  className="bg-surface border border-border p-2 rounded-lg"
+                  style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+                  className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
                 >
-                  <Text className="text-foreground">+</Text>
+                  <Text className="text-foreground font-bold text-lg">+</Text>
                 </Pressable>
               </View>
             </View>
@@ -161,9 +186,10 @@ export default function ImageEditorScreen() {
                       contrast: Math.max(0, currentImage.contrast - 10),
                     })
                   }
-                  className="bg-surface border border-border p-2 rounded-lg"
+                  style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+                  className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
                 >
-                  <Text className="text-foreground">−</Text>
+                  <Text className="text-foreground font-bold text-lg">−</Text>
                 </Pressable>
                 <View className="flex-1 h-1 bg-border rounded-full" />
                 <Pressable
@@ -172,9 +198,10 @@ export default function ImageEditorScreen() {
                       contrast: Math.min(200, currentImage.contrast + 10),
                     })
                   }
-                  className="bg-surface border border-border p-2 rounded-lg"
+                  style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+                  className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
                 >
-                  <Text className="text-foreground">+</Text>
+                  <Text className="text-foreground font-bold text-lg">+</Text>
                 </Pressable>
               </View>
             </View>
@@ -190,19 +217,29 @@ export default function ImageEditorScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View className="gap-3 mt-4">
+          <View className="gap-3 mt-4 flex-row">
             <Pressable
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-              className="bg-primary py-4 rounded-xl items-center"
+              onPress={() => router.back()}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
+              className="bg-surface py-4 rounded-xl border border-border items-center"
             >
-              <Text className="text-background font-semibold text-lg">التالي</Text>
+              <Text className="text-foreground font-semibold text-lg">رجوع</Text>
             </Pressable>
 
             <Pressable
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-              className="bg-surface py-4 rounded-xl border border-border items-center"
+              onPress={() => {
+                // الانتقال إلى شاشة إعدادات PDF
+                router.push({
+                  pathname: "/pdf-settings-screen",
+                  params: {
+                    images: JSON.stringify(editableImages),
+                  },
+                });
+              }}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
+              className="bg-primary py-4 rounded-xl items-center"
             >
-              <Text className="text-foreground font-semibold text-lg">إلغاء</Text>
+              <Text className="text-background font-semibold text-lg">التالي</Text>
             </Pressable>
           </View>
         </View>
