@@ -32,13 +32,23 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <Pressable
-            onPress={() => router.push("/oauth/callback")}
-            style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-            className="bg-primary py-4 rounded-xl items-center"
-          >
-            <Text className="text-background font-semibold text-lg">تسجيل الدخول</Text>
-          </Pressable>
+          <View className="gap-3">
+            <Pressable
+              onPress={() => router.push("/oauth/callback")}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              className="bg-primary py-4 rounded-xl items-center"
+            >
+              <Text className="text-background font-semibold text-lg">تسجيل الدخول عبر الحساب</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.push("/local-login-screen")}
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              className="bg-surface py-4 rounded-xl items-center border border-primary"
+            >
+              <Text className="text-primary font-semibold text-lg">استخدام بدون حساب</Text>
+            </Pressable>
+          </View>
         </View>
       </ScreenContainer>
     );
