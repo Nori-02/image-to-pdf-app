@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, Pressable, Image } from "react-native";
+import { ScrollView, Text, View, Pressable, Image, FlatList, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
@@ -7,6 +7,7 @@ import { useColors } from "@/hooks/use-colors";
 
 interface EditableImage {
   uri: string;
+  name: string;
   rotation: number;
   brightness: number;
   contrast: number;
@@ -18,6 +19,7 @@ export default function ImageEditorScreen() {
   const params = useLocalSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [editableImages, setEditableImages] = useState<EditableImage[]>([]);
+  const [pdfs, setPdfs] = useState<any[]>([]);
 
   // تحميل الصور من المعاملات
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function ImageEditorScreen() {
         const images = JSON.parse(params.images as string);
         const editableImgs = images.map((img: any) => ({
           uri: img.uri,
+          name: img.name,
           rotation: 0,
           brightness: 100,
           contrast: 100,
@@ -33,11 +36,21 @@ export default function ImageEditorScreen() {
         setEditableImages(editableImgs);
       } catch (error) {
         console.error("خطأ في تحميل الصور:", error);
+        Alert.alert("خطأ", "فشل تحميل الصور");
       }
     }
-  }, [params.images]);
 
-  // إذا لم تكن هناك صور، عرض صورة افتراضية
+    if (params.pdfs) {
+      try {
+        const pdfList = JSON.parse(params.pdfs as string);
+        setPdfs(pdfList);
+      } catch (error) {
+        console.error("خطأ في تحميل ملفات PDF:", error);
+      }
+    }
+  }, [params.images, params.pdfs]);
+
+  // إذا لم تكن هناك صور، عرض رسالة
   if (editableImages.length === 0) {
     return (
       <ScreenContainer className="p-6 items-center justify-center">
@@ -67,6 +80,20 @@ export default function ImageEditorScreen() {
     });
   };
 
+  const handleNext = () => {
+    router.push({
+      pathname: "/pdf-settings-screen",
+      params: {
+        images: JSON.stringify(editableImages),
+        pdfs: pdfs.length > 0 ? JSON.stringify(pdfs) : undefined,
+      },
+    });
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <ScreenContainer className="p-6">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -92,7 +119,7 @@ export default function ImageEditorScreen() {
             />
           </View>
 
-          {/* Navigation */}
+          {/* Navigation between images */}
           {editableImages.length > 1 && (
             <View className="flex-row gap-3 justify-between">
               <Pressable
@@ -147,17 +174,17 @@ export default function ImageEditorScreen() {
                 <Text className="text-muted">{currentImage.brightness}%</Text>
               </View>
               <View className="flex-row gap-2 items-center">
-              <Pressable
-                onPress={() =>
-                  updateImage({
-                    brightness: Math.max(0, currentImage.brightness - 10),
-                  })
-                }
-                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-                className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
-              >
-                <Text className="text-foreground font-bold text-lg">−</Text>
-              </Pressable>
+                <Pressable
+                  onPress={() =>
+                    updateImage({
+                      brightness: Math.max(0, currentImage.brightness - 10),
+                    })
+                  }
+                  style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+                  className="bg-surface border border-border p-2 rounded-lg w-10 h-10 items-center justify-center"
+                >
+                  <Text className="text-foreground font-bold text-lg">−</Text>
+                </Pressable>
                 <View className="flex-1 h-1 bg-border rounded-full" />
                 <Pressable
                   onPress={() =>
@@ -217,9 +244,9 @@ export default function ImageEditorScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View className="gap-3 mt-4 flex-row">
+          <View className="gap-3 flex-row">
             <Pressable
-              onPress={() => router.back()}
+              onPress={handleBack}
               style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
               className="bg-surface py-4 rounded-xl border border-border items-center"
             >
@@ -227,15 +254,7 @@ export default function ImageEditorScreen() {
             </Pressable>
 
             <Pressable
-              onPress={() => {
-                // الانتقال إلى شاشة إعدادات PDF
-                router.push({
-                  pathname: "/pdf-settings-screen",
-                  params: {
-                    images: JSON.stringify(editableImages),
-                  },
-                });
-              }}
+              onPress={handleNext}
               style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1, flex: 1 }]}
               className="bg-primary py-4 rounded-xl items-center"
             >
