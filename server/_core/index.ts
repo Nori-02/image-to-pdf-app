@@ -10,7 +10,6 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Enable CORS for all routes - reflect the request origin to support credentials
   app.use((req, res, next) => {
     const origin = req.headers.origin as string | undefined;
     if (origin) {
@@ -51,12 +50,9 @@ async function startServer() {
   // On Render (and most PaaS) you MUST bind to the PORT provided via env var.
   const port = Number(process.env.PORT || 3000);
   if (!process.env.PORT) {
-    console.warn("PORT env var not set; defaulting to 3000 (development)");
-  }
-
-  server.listen(port, () => {
-    console.log(`[api] server listening on port ${port}`);
-  });
+  console.warn("PORT env var not set; defaulting to 3000 (development)");
 }
 
-startServer().catch(console.error);
+server.listen(port, () => {
+  console.log(`[api] server listening on port ${port}`);
+});
