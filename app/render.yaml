@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: image-to-pdf-app
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        scope: build
+      - key: DATABASE_URL
+        scope: runtime
+    routes:
+      - path: /
+        destination: /
