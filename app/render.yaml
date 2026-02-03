@@ -9,9 +9,6 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        scope: build
-      - key: DATABASE_URL
         scope: runtime
-    routes:
-      - path: /
-        destination: /
+    healthCheckPath: /api/health
+    autoDeploy: true
