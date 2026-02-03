@@ -60,3 +60,5 @@ Thumbs.db
 *.tgz
 *.tar.gz
 .cache/
+# do not commit keystore
+image-to-pdf-release.keystore
